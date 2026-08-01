@@ -1,12 +1,27 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@repo/api",
+  "private": true,
+  "version": "0.0.1",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "type-check": "tsc --noEmit"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "morgan": "^1.11.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.15.3",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
 }
