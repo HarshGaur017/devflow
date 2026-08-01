@@ -2,28 +2,24 @@ import { prisma } from "../../database/prisma.js";
 
 import type { AuthenticatedGitHubUser } from "../github/github.types.js";
 
-export async function saveGitHubUser(
-  github: AuthenticatedGitHubUser
-) {
-  const existingAccount =
-    await prisma.gitHubAccount.findUnique({
-      where: {
-        githubId: github.githubId,
-      },
-      include: {
-        user: true,
-      },
-    });
+export async function saveGitHubUser(github: AuthenticatedGitHubUser) {
+  const existingAccount = await prisma.gitHubAccount.findUnique({
+    where: {
+      githubId: github.githubId,
+    },
+    include: {
+      user: true,
+    },
+  });
 
   if (existingAccount) {
-    return prisma.gitHubAccount.update({
+    await prisma.gitHubAccount.update({
       where: {
         githubId: github.githubId,
       },
       data: {
         username: github.username,
         accessToken: github.accessToken,
-
         user: {
           update: {
             name: github.name,
@@ -32,8 +28,14 @@ export async function saveGitHubUser(
           },
         },
       },
+    });
+
+    return prisma.user.findUniqueOrThrow({
+      where: {
+        id: existingAccount.user.id,
+      },
       include: {
-        user: true,
+        github: true,
       },
     });
   }
@@ -53,6 +55,17 @@ export async function saveGitHubUser(
       },
     },
 
+    include: {
+      github: true,
+    },
+  });
+}
+
+export async function findUserById(id: string) {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
     include: {
       github: true,
     },
