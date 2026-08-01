@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../database/prisma";
 
 export async function getHealthStatus() {
   await prisma.$queryRaw`SELECT 1`;
