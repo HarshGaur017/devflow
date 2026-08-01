@@ -1,14 +1,12 @@
-import type { HealthStatus } from './health.types.js';
+import { prisma } from "../../lib/prisma";
 
-export function getHealthStatus(): HealthStatus {
-  const health: HealthStatus = {
-    status: 'ok',
-    service: 'devflow-api',
-    version: process.env.npm_package_version ?? '0.0.0',
-    environment: process.env.NODE_ENV ?? 'development',
-    uptime: process.uptime(),
+export async function getHealthStatus() {
+  await prisma.$queryRaw`SELECT 1`;
+
+  return {
+    status: "ok",
+    service: "devflow-api",
+    database: "connected",
     timestamp: new Date().toISOString(),
   };
-
-  return health;
 }

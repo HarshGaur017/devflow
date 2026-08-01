@@ -1,6 +1,9 @@
-import type { Request, Response } from 'express';
-import { getHealthStatus } from './health.service.js';
+import type { Request, Response } from "express";
+import { getHealthStatus } from "./health.service.js";
 
-export function getHealth(_req: Request, res: Response): void {
-  res.json(getHealthStatus());
+export async function getHealth(
+  _req: Request,
+  res: Response
+) {
+  res.json(await getHealthStatus());
 }
