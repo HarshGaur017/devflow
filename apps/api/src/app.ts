@@ -2,8 +2,10 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import healthRouter from './modules/health/health.route.js';
-import authRouter from './modules/auth/auth.route.js';
+import healthRouter from './modules/health/health.route';
+import authRouter from './modules/auth/auth.route';
+import githubRouter from './modules/github/github.route';
+import dashboardRouter from './modules/dashboard/dashboard.route';
 import cookieParser from "cookie-parser";
 
 const app: Express = express();
@@ -20,6 +22,6 @@ app.use((req, _res, next) => {
   next();
 });
 app.use(authRouter);
-
-
+app.use(githubRouter);
+app.use(dashboardRouter);
 export default app;
