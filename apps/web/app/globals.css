@@ -1,13 +1,49 @@
+@import "tailwindcss";
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f6f8fa;
+  --color-fg: #1f2328;
+  --color-fg-muted: #59636e;
+  --color-border: #d1d9e0;
+  --color-accent: #0969da;
+  --color-card: #ffffff;
+
+  /* Data visualisation. --color-data is validated against --color-card in both
+     modes (lightness band, chroma floor, >=3:1 contrast). --color-data-track is
+     the unfilled bar track; --color-grid is the recessive hairline. */
+  --color-data: #0969da;
+  --color-data-track: #eaeef2;
+  --color-grid: #d8dee4;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-bg: #0d1117;
+    --color-bg-subtle: #161b22;
+    --color-fg: #e6edf3;
+    --color-fg-muted: #8b949e;
+    --color-border: #30363d;
+    --color-accent: #4493f8;
+    --color-card: #161b22;
+
+    --color-data: #4493f8;
+    --color-data-track: #21262d;
+    --color-grid: #30363d;
   }
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-bg-subtle: var(--color-bg-subtle);
+  --color-fg: var(--color-fg);
+  --color-fg-muted: var(--color-fg-muted);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-card: var(--color-card);
+  --color-data: var(--color-data);
+  --color-data-track: var(--color-data-track);
+  --color-grid: var(--color-grid);
 }
 
 html,
@@ -17,34 +53,15 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--color-fg);
+  background: var(--color-bg);
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-}
-
-.imgDark {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-
-  .imgLight {
-    display: none;
-  }
-  .imgDark {
-    display: unset;
-  }
 }

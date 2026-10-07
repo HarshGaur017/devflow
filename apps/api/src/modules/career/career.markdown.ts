@@ -1,0 +1,158 @@
+import type { CareerReportDto } from "./career.dto.js";
+
+function number(value: number): string {
+  return value.toLocaleString("en-US");
+}
+
+/**
+ * Render the report as Markdown the developer can paste straight into a CV,
+ * a portfolio page or a Notion doc.
+ */
+export function renderReportMarkdown(report: CareerReportDto): string {
+  const { stats, synthesis } = report;
+  const lines: string[] = [];
+
+  const from = stats.windowStart.slice(0, 10);
+  const to = stats.windowEnd.slice(0, 10);
+
+  lines.push(`# Developer summary, ${from} to ${to}`);
+  lines.push("");
+
+  if (synthesis) {
+    lines.push(`**${synthesis.headline}**`);
+    lines.push("");
+    lines.push(synthesis.summary);
+    lines.push("");
+  }
+
+  lines.push("## By the numbers");
+  lines.push("");
+  lines.push(`- ${number(stats.totals.commits)} commits across ${stats.totals.repositories} repositories (${stats.totals.privateRepositories} private)`);
+  lines.push(`- ${number(stats.totals.additions)} lines added, ${number(stats.totals.deletions)} removed`);
+  lines.push(`- ${number(stats.totals.filesChanged)} file changes`);
+  lines.push(`- Active on ${stats.activity.activeDays} days, longest streak ${stats.activity.longestStreakDays} days`);
+  if (stats.organizations.length > 0) {
+    lines.push(`- Organisations: ${stats.organizations.join(", ")}`);
+  }
+  lines.push("");
+
+  if (synthesis) {
+    lines.push("## Skills");
+    lines.push("");
+    lines.push(`**Languages:** ${synthesis.skills.languages.join(", ")}`);
+    lines.push("");
+    lines.push(`**Frameworks and libraries:** ${synthesis.skills.frameworks.join(", ")}`);
+    lines.push("");
+    lines.push(`**Infrastructure:** ${synthesis.skills.infrastructure.join(", ")}`);
+    lines.push("");
+    lines.push(`**Practices:** ${synthesis.skills.practices.join(", ")}`);
+    lines.push("");
+  } else {
+    lines.push("## Languages");
+    lines.push("");
+    for (const language of stats.languages.slice(0, 12)) {
+      lines.push(`- ${language.name} — ${language.share}% of code, ${language.repoCount} repos`);
+    }
+    lines.push("");
+    lines.push("## Technologies");
+    lines.push("");
+    for (const tech of stats.techStack.slice(0, 40)) {
+      lines.push(`- ${tech.name} (${tech.category}, ${tech.repoCount} repos)`);
+    }
+    lines.push("");
+  }
+
+  if (synthesis && synthesis.feature_themes.length > 0) {
+    lines.push("## What I have built");
+    lines.push("");
+    for (const theme of synthesis.feature_themes) {
+      lines.push(`### ${theme.theme}`);
+      lines.push("");
+      lines.push(theme.description);
+      if (theme.evidence_repos.length > 0) {
+        lines.push("");
+        lines.push(`*Evidence: ${theme.evidence_repos.join(", ")}*`);
+      }
+      lines.push("");
+    }
+  }
+
+  if (synthesis && synthesis.projects.length > 0) {
+    lines.push("## Projects");
+    lines.push("");
+    for (const project of synthesis.projects) {
+      lines.push(`### ${project.title}`);
+      lines.push("");
+      lines.push(`\`${project.repo}\``);
+      lines.push("");
+      lines.push(project.what_it_is);
+      lines.push("");
+      lines.push(`**My role:** ${project.your_role}`);
+      if (project.tech.length > 0) {
+        lines.push("");
+        lines.push(`**Stack:** ${project.tech.join(", ")}`);
+      }
+      if (project.resume_bullets.length > 0) {
+        lines.push("");
+        lines.push("**CV bullets:**");
+        lines.push("");
+        for (const bullet of project.resume_bullets) lines.push(`- ${bullet}`);
+      }
+      lines.push("");
+    }
+  }
+
+  if (synthesis && synthesis.impact.length > 0) {
+    lines.push("## Impact");
+    lines.push("");
+    for (const item of synthesis.impact) {
+      lines.push(`- **${item.claim}**`);
+      lines.push(`  *Evidence:* ${item.evidence}`);
+    }
+    lines.push("");
+  }
+
+  if (synthesis && synthesis.seniority_signals.length > 0) {
+    lines.push("## Scope and seniority signals");
+    lines.push("");
+    for (const signal of synthesis.seniority_signals) lines.push(`- ${signal}`);
+    lines.push("");
+  }
+
+  lines.push("## Repository breakdown");
+  lines.push("");
+  lines.push("| Repository | Visibility | Commits | +/- | Stack |");
+  lines.push("| --- | --- | --- | --- | --- |");
+  for (const repo of stats.repositories) {
+    lines.push(
+      `| ${repo.nameWithOwner} | ${repo.isPrivate ? "private" : "public"} | ${number(repo.commits)} | +${number(repo.additions)}/-${number(repo.deletions)} | ${repo.technologies.slice(0, 5).join(", ")} |`,
+    );
+  }
+  lines.push("");
+
+  if (synthesis) {
+    lines.push("## Portfolio pitch");
+    lines.push("");
+    lines.push(synthesis.portfolio_pitch);
+    lines.push("");
+
+    if (synthesis.gaps.length > 0) {
+      lines.push("## Gaps to close");
+      lines.push("");
+      for (const gap of synthesis.gaps) lines.push(`- ${gap}`);
+      lines.push("");
+    }
+  }
+
+  lines.push("---");
+  lines.push("");
+  lines.push(
+    `Generated by DevFlow from GitHub commit history on ${new Date().toISOString().slice(0, 10)}.${
+      report.aiDriver && report.aiDriver !== "none"
+        ? ` Narrative sections written by Claude (${report.aiDriver}) from the statistics above.`
+        : ""
+    }`,
+  );
+
+  return lines.join("\n");
+}

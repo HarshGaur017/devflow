@@ -14,7 +14,8 @@ model User {
   email     String?
   avatarUrl String?
 
-  github GitHubAccount?
+  github       GitHubAccount?
+  careerScans  CareerScan[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,4 +38,52 @@ model GitHubAccount {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+enum CareerScanStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+/// A single "summarise my last N years of commits" run.
+/// Progress columns are written as the scan walks repositories so the
+/// frontend can poll; `stats` and `synthesis` hold the finished report.
+model CareerScan {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status CareerScanStatus @default(PENDING)
+
+  windowStart DateTime
+  windowEnd   DateTime
+
+  totalRepos     Int     @default(0)
+  processedRepos Int     @default(0)
+  currentRepo    String?
+
+  /// Deterministic aggregate (languages, tech stack, totals, timeline, per-repo rollup).
+  stats Json?
+
+  /// LLM synthesis (summary, projects, feature themes, impact, resume bullets).
+  synthesis Json?
+
+  /// Which AI driver produced `synthesis`: "claude-cli" | "anthropic-api" | "none".
+  aiDriver String?
+
+  /// Hard failure that stopped the scan.
+  error String?
+
+  /// Non-fatal note from a completed scan, e.g. the AI step was unavailable.
+  warning String?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
 }
