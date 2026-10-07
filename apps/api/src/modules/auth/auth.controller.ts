@@ -23,7 +23,18 @@ export async function githubCallback(_req: Request, res: Response) {
     sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-  return res.json(user);
+
+  const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:3000";
+  return res.redirect(`${frontendUrl}/dashboard`);
+}
+
+export function logout(_req: Request, res: Response) {
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+  res.status(204).send();
 }
 
 export async function getCurrentUser(

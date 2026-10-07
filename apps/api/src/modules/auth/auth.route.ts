@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {githubLogin, githubCallback, getCurrentUser} from './auth.controller.js';
+import {githubLogin, githubCallback, getCurrentUser, logout} from './auth.controller.js';
 import { requireAuth } from './auth.middleware.js';
 
 const router = Router();
@@ -8,5 +8,6 @@ router.get('/auth/github', githubLogin);
 
 router.get('/auth/github/callback', githubCallback);
 router.get('/auth/me', requireAuth, getCurrentUser);
+router.get('/auth/logout', logout);
 
 export default router;
